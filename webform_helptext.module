@@ -38,12 +38,12 @@ function webform_helptext_menu() {
 /**
  * Webform Help text configuration page.
  */
-function webform_helptext_config($form, $form_state, $webform_nid) {
+function webform_helptext_config($form, &$form_state, $webform_nid) {
   $node = node_load($webform_nid);
+  $form_state['storage']['node'] = $node;
 
   if ($node) {
     $fields = $node->webform['components'];
-    $default_values = variable_get('webfor_helptext_' . $node->uuid);
 
     $form['form_uuid'] = array(
       '#type' => 'hidden',
@@ -72,7 +72,8 @@ function webform_helptext_config($form, $form_state, $webform_nid) {
       $form['fields'][$field['form_key']]['value'] = array(
         '#type' => 'textfield',
         '#title' => $field['name'],
-        '#default_value' => !empty($default_values[$field['form_key']]['value']) ? $default_values[$field['form_key']]['value'] : '',
+        '#default_value' => !empty($field['extra']['attributes']) ?
+          $field['extra']['attributes']["data-help-text-{$field['form_key']}"] : '',
         '#description' => t('Enter help text for ' . $field['name'] . ' field.')
       );
 
@@ -101,11 +102,17 @@ function webform_helptext_config($form, $form_state, $webform_nid) {
 function webform_helptext_config_submit($form, &$form_state) {
   if ($form['#form_id'] === 'webform_helptext_config') {
     if (!empty($form_state['values']['fields']) && !empty($form_state['values']['form_uuid'])) {
-      $variable = array();
-      foreach ($form_state['values']['fields'] as $field => $value) {
-        $variable[$field] = $value;
+      // This argument is the Webform NID.
+      $node = $form_state['storage']['node'];
+
+      foreach ($node->webform['components'] as $key => $component) {
+        // Add help text as data attribute on the Webform component.
+        $component['extra']['attributes'] = array(
+          'data-info-icon' => 'info-icon-' . $component['form_key'],
+          "data-help-text-{$component['form_key']}" => $form_state['values']['fields'][$component['form_key']]['value'],
+        );
+        webform_component_update($component);
       }
-      variable_set('webfor_helptext_' . $form_state['values']['form_uuid'], $variable);
 
       drupal_set_message('Help text configuration is saved.', 'status');
     }
@@ -120,31 +127,27 @@ function webform_helptext_form_alter(&$form, &$form_state, $form_id) {
   if (isset($form['#node']) && isset($form['#node']->nid)
     && ($form['#form_id'] === 'webform_client_form_' . $form['#node']->nid)
     && ($form['#node']->type === 'webform')) {
+    // Add Webform Help Text CSS file to the webform.
     $form['#attached']['css'][] = drupal_get_path('module', 'webform_helptext') . '/css/webform_helptext.css';
 
     $node = $form['#node'];
 
-    if (isset($node->uuid)) {
-      $help_text = variable_get('webfor_helptext_' . $node->uuid, array());
-      if (!empty($help_text)) {
-        drupal_add_js(drupal_get_path('module', 'webform_helptext') . '/js/webform_helptext.js');
-        drupal_add_js(array(
-          'webformHelptext' => array(
-            'helpText' => $help_text,
-            'uuid' => $node->uuid,
-          ),
-          'webform_uuid' => $node->uuid,
-        ), 'setting');
+    $form_fields = array();
+    foreach ($node->webform['components'] as $key => $component) {
+      if (!empty($component['extra']['attributes'])
+        && !empty($component['extra']['attributes']["data-help-text-{$component['form_key']}"])) {
+        $form_fields[$component['form_key']] = $component['form_key'];
       }
     }
+
+    if (!empty($form_fields)) {
+      drupal_add_js(drupal_get_path('module', 'webform_helptext') . '/js/webform_helptext.js');
+      drupal_add_js(array(
+        'webformHelptext' => array(
+          'formFields' => $form_fields,
+          'nid' => $node->nid,
+        ),
+      ), 'setting');
+    }
   }
-
-}
-
-/**
- * Implements hook_webform_component_render_alter().
- */
-function webform_helptext_webform_component_render_alter(&$element, &$component) {
-  $element['#attributes']['data-info-icon'] = 'info-icon-' . $component['form_key'];
-
 }

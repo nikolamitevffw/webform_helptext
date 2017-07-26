@@ -1,15 +1,15 @@
 (function ($) {
   Drupal.behaviors.webformHelptext = {
     attach: function (context, settings) {
-      var webform_uuid = settings.webform_uuid;
-      $('#webform-uuid-' + webform_uuid, context).once(function(){
-        var helpText = settings.webformHelptext.helpText;
-        for (var field in helpText) {
-          if (helpText[field].value.length > 0) {
+      var webform_nid = settings.webformHelptext.nid;
+      $('.webform-client-form-' + webform_nid, context).once(function(){
+        var formFields = settings.webformHelptext.formFields;
+        for (var field in formFields) {
+          if (formFields[field].length > 0 || true) {
             // Build info icon.
             var infoIcon = $('<span></span>', {'class' : 'help-text-info-icon', 'id' : field}).text("i");
-            infoIcon.attr('help-text', helpText[field].value);
             var webform_component = $('*[data-info-icon="info-icon-' + field + '"]');
+            infoIcon.attr('help-text', webform_component.data('help-text-' + field));
 
             // Adjust icon attachment depending on webform component type.
             if (webform_component.parents('.webform-datepicker').length > 0) {
