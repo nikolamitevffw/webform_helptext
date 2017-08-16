@@ -45,11 +45,6 @@ function webform_helptext_config($form, &$form_state, $webform_nid) {
   if ($node) {
     $fields = $node->webform['components'];
 
-    $form['form_uuid'] = array(
-      '#type' => 'hidden',
-      '#default_value' => $node->uuid,
-    );
-
     $form['fields'] = array(
       '#type' => 'fieldset',
       '#title' => $node->title . ' help text configuration',
@@ -101,7 +96,7 @@ function webform_helptext_config($form, &$form_state, $webform_nid) {
  */
 function webform_helptext_config_submit($form, &$form_state) {
   if ($form['#form_id'] === 'webform_helptext_config') {
-    if (!empty($form_state['values']['fields']) && !empty($form_state['values']['form_uuid'])) {
+    if (!empty($form_state['values']['fields'])) {
       // This argument is the Webform NID.
       $node = $form_state['storage']['node'];
 
