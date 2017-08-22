@@ -3,4 +3,4 @@ description = Provides help icon for Webform fields with configurable text.
 core = 7.x
 package = Webform
 
-dependecies[] = webform
+dependencies[] = webform
