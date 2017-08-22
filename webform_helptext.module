@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * Implements hook_form_alter().
+ */
+function webform_helptext_form_alter(&$form, \Drupal\Core\Form\FormStateInterface $form_state, $form_id) {
+  if (isset($form['#webform_id']) && ($form['#form_id'] === 'webform_submission_' . $form['#webform_id'] . '_form')) {
+    $form_fields = array();
+    $elements = $form['elements'];
+    foreach ($elements as $key => $element) {
+      if (!empty($element['#attributes'])
+        && !empty($element['#attributes']["data-help-text-{$key}"])) {
+        $form_fields[$key] = $key;
+      }
+    }
+
+    if (!empty($form_fields)) {
+      $form['#attached']['library'][] = 'webform_helptext/webform_helptext';
+      $form['#attached']['drupalSettings']['webform_helptext']['form_fields'] = $form_fields;
+      $form['#attached']['drupalSettings']['webform_helptext']['form_selector'] = $form['#attributes']['data-drupal-selector'];
+    }
+  }
+}
