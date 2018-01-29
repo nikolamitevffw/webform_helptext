@@ -12,3 +12,7 @@ At this moment the only thing you will need to use this module is the `Webform` 
 
 ## Configuration export
 Configured Help Text can be exported with the Webform's export as itis stored as component attribute. 
+
+## Project Information
+* Drupal project: https://www.drupal.org/project/webform_helptext
+* Github project: https://github.com/nikolamitevffw/webform_helptext
