@@ -80,7 +80,7 @@ class WebformHelptext extends FormBase {
       $webform->set('elements', $webform_elements);
       $webform->save();
 
-      drupal_set_message('Help text configuration is saved.', 'status');
+      \Drupal::messenger()->addMessage(t('Help text configuration is saved.'), 'status');
     }
   }
 }
