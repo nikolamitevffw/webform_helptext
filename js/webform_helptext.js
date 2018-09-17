@@ -1,3 +1,8 @@
+/**
+ * @file
+ * Contains webform_helptext.js.
+ */
+
 (function ($) {
   Drupal.behaviors.webformHelptext = {
     attach: function (context, settings) {
@@ -38,7 +43,7 @@
         });
 
         // Remove the help text block on mouse leave.
-        $('.help-text-info-icon', context).mouseleave( function (e) {
+        $('.help-text-info-icon', context).mouseleave(function (e) {
           $('.help-text-info-block').remove();
         });
       });

@@ -6,6 +6,9 @@ use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Serialization\Yaml;
 
+/**
+ * WebformHelptext class.
+ */
 class WebformHelptext extends FormBase {
 
   /**
@@ -24,16 +27,16 @@ class WebformHelptext extends FormBase {
     $webform_elements = $webform->get('elements');
     $elements = Yaml::decode($webform_elements);
 
-    $storage = array('webform' => $webform, 'elements' => $elements);
+    $storage = ['webform' => $webform, 'elements' => $elements];
     $form_state->setStorage($storage);
 
-    $form['fields'] = array(
+    $form['fields'] = [
       '#type' => 'fieldset',
       '#title' => $webform->get('title') . ' help text configuration',
       '#collapsible' => TRUE,
       '#tree' => TRUE,
       '#collapsed' => FALSE,
-    );
+    ];
 
     foreach ($elements as $key => $element) {
       // Exclude hidden fields.
@@ -41,19 +44,19 @@ class WebformHelptext extends FormBase {
         continue;
       }
 
-      $form['fields'][$key]['value'] = array(
+      $form['fields'][$key]['value'] = [
         '#type' => 'textfield',
         '#title' => $element['#title'],
         '#default_value' => !empty($element['#attributes']) ?
           $element['#attributes']["data-help-text-{$key}"] : '',
-        '#description' => t('Enter help text for ' . $element['#title'] . ' field.')
-      );
+        '#description' => t('Enter help text for @title field.', ['@title' => $element['#title']]),
+      ];
     }
 
-    $form['submit'] = array(
+    $form['submit'] = [
       '#type' => 'submit',
-      '#value' => t('Save'),
-    );
+      '#value' => $this->t('Save'),
+    ];
 
     return $form;
   }
@@ -70,17 +73,18 @@ class WebformHelptext extends FormBase {
 
       foreach ($elements as $key => $element) {
         // Add help text as data attribute on the Webform component.
-        $elements[$key]['#attributes'] = array(
+        $elements[$key]['#attributes'] = [
           'data-info-icon' => 'info-icon-' . $key,
           "data-help-text-{$key}" => $values['fields'][$key]['value'],
-        );
+        ];
       }
 
       $webform_elements = Yaml::encode($elements);
       $webform->set('elements', $webform_elements);
       $webform->save();
 
-      \Drupal::messenger()->addMessage(t('Help text configuration is saved.'), 'status');
+      \Drupal::messenger()->addMessage($this->t('Help text configuration is saved.'), 'status');
     }
   }
+
 }
