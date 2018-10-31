@@ -12,7 +12,12 @@ use Drupal\Core\Form\FormStateInterface;
  * Implements hook_form_alter().
  */
 function webform_helptext_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  if (isset($form['#webform_id']) && ($form['#form_id'] === 'webform_submission_' . $form['#webform_id'] . '_form')) {
+  $form_ids = [
+    'webform_submission_' . $form['#webform_id'] . '_form',
+    'webform_submission_' . $form['#webform_id'] . '_add_form',
+  ];
+
+  if (isset($form['#webform_id']) && in_array($form_id, $form_ids)) {
     $form_fields = [];
     $elements = $form['elements'];
     foreach ($elements as $key => $element) {
