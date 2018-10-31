@@ -12,26 +12,28 @@ use Drupal\Core\Form\FormStateInterface;
  * Implements hook_form_alter().
  */
 function webform_helptext_form_alter(&$form, FormStateInterface $form_state, $form_id) {
-  $form_ids = [
-    'webform_submission_' . $form['#webform_id'] . '_form',
-    'webform_submission_' . $form['#webform_id'] . '_add_form',
-    'webform_submission_' . $form['#webform_id'] . '_test_form',
-  ];
+  if (isset($form['#webform_id']) {
+    $form_ids = [
+      'webform_submission_' . $form['#webform_id'] . '_form',
+      'webform_submission_' . $form['#webform_id'] . '_add_form',
+      'webform_submission_' . $form['#webform_id'] . '_test_form',
+    ];
 
-  if (isset($form['#webform_id']) && in_array($form_id, $form_ids)) {
-    $form_fields = [];
-    $elements = $form['elements'];
-    foreach ($elements as $key => $element) {
-      if (!empty($element['#attributes'])
-        && !empty($element['#attributes']["data-help-text-{$key}"])) {
-        $form_fields[$key] = $key;
+    if (in_array($form_id, $form_ids)) {
+      $form_fields = [];
+      $elements = $form['elements'];
+      foreach ($elements as $key => $element) {
+        if (!empty($element['#attributes'])
+          && !empty($element['#attributes']["data-help-text-{$key}"])) {
+          $form_fields[$key] = $key;
+        }
       }
-    }
 
-    if (!empty($form_fields)) {
-      $form['#attached']['library'][] = 'webform_helptext/webform_helptext';
-      $form['#attached']['drupalSettings']['webform_helptext']['form_fields'] = $form_fields;
-      $form['#attached']['drupalSettings']['webform_helptext']['form_selector'] = $form['#attributes']['data-drupal-selector'];
+      if (!empty($form_fields)) {
+        $form['#attached']['library'][] = 'webform_helptext/webform_helptext';
+        $form['#attached']['drupalSettings']['webform_helptext']['form_fields'] = $form_fields;
+        $form['#attached']['drupalSettings']['webform_helptext']['form_selector'] = $form['#attributes']['data-drupal-selector'];
+      }
     }
   }
 }
